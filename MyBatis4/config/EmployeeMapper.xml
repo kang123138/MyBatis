@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace：要实现的接口的全类名 -->
+<mapper namespace="com.atguigu.mybatis.mapper.EmployeeMapper">
+	<!-- id：必须是接口中方法的方法名，不能随便指定 resultType：接口中方法的返回值类型的全类名 -->
+
+	<select id="getEmployeeByWithAssociation" resultMap="customMap3">
+		SELECT
+		e.*,d.id d_id,d.name d_name
+		FROM employees e
+		LEFT JOIN departments d
+		ON
+		e.dept_id = d.id
+		WHERE e.id =
+		#{id};
+	</select>
+
+	<!-- 自定义 结果集 -->
+	<!-- <resultMap type="com.atguigu.mybatis.entities.Employee" id="customMap3"> 
+		映射主键 <id column="id" property="id"/> 映射其他列 <result column="last_name" property="lastName"/> 
+		<result column="email" property="email"/> <result column="salary" property="salary"/> 
+		使用级联属性赋值 <result column="d_id" property="deptId.id"/> <result column="d_name" 
+		property="deptId.departmentName"/> </resultMap> -->
+
+	<!-- ===================================================================================== -->
+
+	<!-- 自定义结果集之使用association联合查询 -->
+	<resultMap type="com.atguigu.mybatis.entities.Employee" id="customMap3">
+		<!-- 映射主键 -->
+		<id column="id" property="id" />
+		<!-- 映射其他列 -->
+		<result column="last_name" property="lastName" />
+		<result column="email" property="email" />
+		<result column="salary" property="salary" />
+		<!-- 使用association赋值 -->
+		<association property="deptId"
+			javaType="com.atguigu.mybatis.entities.Department">
+			<!-- 映射主键 -->
+			<id column="d_id" property="id" />
+			<!-- 映射其他列 -->
+			<result column="d_name" property="departmentName" />
+		</association>
+	</resultMap>
+
+	<!-- -->
+	<select id="getEmployeeWithAssociationByStep" resultMap="custom">
+		select *
+		from employees where id = #{id}
+	</select>
+
+	<resultMap type="com.atguigu.mybatis.entities.Employee" id="custom">
+		<!-- 映射主键 -->
+		<id column="id" property="id" />
+		<!-- 映射其他列 -->
+		<result column="last_name" property="lastName" />
+		<result column="email" property="email" />
+		<result column="salary" property="salary" />
+		<!-- 使用association分步查询赋值 -->
+		<association property="deptId"
+			select="com.atguigu.mybatis.mapper.DepartmentMapper.getDepartmentById"
+			column="dept_id">
+
+		</association>
+	</resultMap>
+
+	<!-- 使用if标签动态生成sql语句 -->
+	<select id="getEmployoeeByIf" resultType="com.atguigu.mybatis.entities.Employee">
+		select * from employees
+		<where>
+			<if test="id != null">
+				id = #{id }
+			</if>
+			<if test="lastName != null and lastName != ''">
+				and last_name = #{lastName}
+			</if>
+			<if test="email != null">
+				and email = #{email}
+			</if>
+			<if test="salary != 0">
+				and salary = #{salary }
+			</if>
+		</where>
+	</select>
+
+	<select id="getEmployoeeByChoose" resultType="com.atguigu.mybatis.entities.Employee">
+		select * from employees where
+		<choose>
+			<when test="id != null">
+				id = #{id}
+			</when>
+			<when test="lastName != null">
+				last_name = #{lastName}
+			</when>
+			<when test="email != null">
+				email = #{email}
+			</when>
+			<when test="salary != 0">
+				salary = #{salary}
+			</when>
+			<otherwise>1=1</otherwise>
+		</choose>
+	</select>
+
+	<update id="updateEmployeeBySet">
+		update employees set
+		<!-- set标签可以去除条件后面的逗号 -->
+		<trim prefixOverrides=",">
+			<if test="lastName != null">
+				last_name = #{lastName}
+			</if>
+			<if test="email != null">
+				,email = #{email}
+			</if>
+			<if test="salary != 0">
+				,salary = #{salary}
+			</if>
+		</trim>
+		where id = #{id}
+	</update>
+
+	<select id="getEmployeesByForeach" resultType="com.atguigu.mybatis.entities.Employee">
+		select * from employees where id in
+		<!-- collection：要遍历的集合 item：指定一个变量接受遍历到的值 open：指定一个开始的符号 close：指定一个结束的符号 
+			separator：指定一个遍历得到的每个数之间的分割符 index：指定索引 -->
+		<foreach collection="ids" item="id" open="(" close=")"
+			separator=",">
+			#{id}
+		</foreach>
+	</select>
+</mapper>
