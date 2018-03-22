@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace：要实现的接口的全类名 -->
+<mapper namespace="com.atguigu.mybatis.mapper.EmployeeMapper">
+	<!-- id：必须是接口中方法的方法名，不能随便指定 resultType：接口中方法的返回值类型的全类名 -->
+	<select id="getEmployeeById" resultType="com.atguigu.mybatis.entities.Employee">
+		select last_name lastName,email,salary,dept_id deptId from employees
+		where id = #{id}
+		<!-- select * from employees where id = #{id} -->
+	</select>
+
+	<select id="getEmployeeByWithAssociation" resultMap="customMap3">
+		SELECT e.*,d.id d_id,d.name d_name
+		FROM employees e
+		LEFT JOIN departments d
+		ON e.dept_id = d.id
+		WHERE e.id =
+		#{id};
+	</select>
+
+	<!-- 自定义 结果集 -->
+	<resultMap type="com.atguigu.mybatis.entities.Employee" id="customMap3">
+		<!-- 映射主键 -->
+		<id column="id" property="id" />
+		<!-- 映射其他列 -->
+		<result column="last_name" property="lastName" />
+		<result column="email" property="email" />
+		<result column="salary" property="salary" />
+		<!-- 通过association进行分步查询 select：设置调用那个接口的那个方法查询该属性 column：设置将Employe中那一列的值传入到select属性中的方法中 -->
+		<association property="deptId"
+			javaType="com.atguigu.mybatis.entities.Department">
+			<!-- 映射主键 -->
+			<id column="d_id" property="id" />
+			<!-- 映射其他列 -->
+			<result column="d_name" property="departmentName" />
+		</association>
+	</resultMap>
+	
+	<!-- ===================================================================================== -->
+	
+	<!-- 通过association进行分步查询： 1.根据员工的id将Employee查询出来 2.根据Employee中部门的id将部门查询出来 
+		3.将部门设置到Employee中 -->
+	<select id="getEmployeeWithAssociationByStep" resultMap="customMap4">
+		select * from employees where id = #{id}
+	</select>
+
+	<!-- 自定义 结果集 -->
+	<resultMap type="com.atguigu.mybatis.entities.Employee" id="customMap4">
+		<!-- 映射主键 -->
+		<id column="id" property="id" />
+		<!-- 映射其他列 -->
+		<result column="last_name" property="lastName" />
+		<result column="email" property="email" />
+		<result column="salary" property="salary" />
+		<!-- 通过association进行分步查询 select：设置调用那个接口的那个方法查询该属性 column：设置将Employe中那一列的值传入到select属性中的方法中 -->
+		<association property="deptId"
+	select="com.atguigu.mybatis.mapper.DepartmentMapper.getDepartmentById"
+	column="dept_id"></association>
+	</resultMap>
+</mapper>
