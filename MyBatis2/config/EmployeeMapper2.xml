@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.atguigu.mybatis.mapper.EmployeeMapper2">
+
+	<!-- 需求：在查询员工信息的同时将部门信息也查询出来 -->
+	<select id="getEmployeeByIdContainsDept" resultMap="cutomMap">
+		SELECT e.id
+		e_id, last_name, email, salary,dept_id,d.id d_id, d.name d_name FROM
+		employees e, departments d WHERE e.dept_id=d.id AND e.dept_id = #{id};
+	</select>
+
+	<!-- type -->
+	<resultMap type="com.atguigu.mybatis.entities.Employee2" id="cutomMap">
+		<id column="e_id" property="id" />
+		<id column="last_name" property="lastName" />
+		<id column="email" property="email" />
+		<id column="salary" property="salary" />
+		<id column="d_id" property="deptId.id" />
+		<id column="d_name" property="deptId.departmentName" />
+	</resultMap>
+
+</mapper>
