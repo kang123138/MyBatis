@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace：要实现的接口的全类名 -->
+<mapper namespace="com.atguigu.mybatis.mapper.EmployeeMapper">
+	<!-- id：必须是接口中方法的方法名，不能随便指定 
+		resultType：接口中方法的返回值类型的全类名 -->
+	<select id="getEmployeeById" resultType="aaa">
+		<!-- select id,last_name lastName,email,salary,dept_id deptId from employees where id = #{id} -->
+		select * from employees where id = #{id}
+	</select>
+</mapper>
